@@ -3,31 +3,31 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Замените на вашу основную ветку, если она называется иначе (например, master)
+      - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # Выбираем ОС для работы
-
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2  # Клонируем репозиторий
+      - uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2  # Устанавливаем Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Указываем нужную версию Node.js
-
-      - name: Set up Git user
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"  # Указываем email для Git
+          node-version: 22
 
       - name: Install dependencies
-        run: npm install  # Устанавливаем зависимости
+        run: npm install
 
-      - name: Build the project
-        run: npm run build  # Собираем проект
+      - name: Clean cache
+        run: rm -rf node_modules/.cache
+
+      - name: Build project
+        run: npm run build
 
       - name: Deploy to GitHub Pages
-        run: npm run deploy  # Выполняем команду для деплоя
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
