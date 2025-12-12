@@ -16,7 +16,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2  # Устанавливаем Node.js
         with:
-          node-version: '20'  # Укажите нужную версию Node.js
+          node-version: '20'  # Указываем нужную версию Node.js
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"  # Указываем email для Git
 
       - name: Install dependencies
         run: npm install  # Устанавливаем зависимости
