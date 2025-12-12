@@ -1,0 +1,28 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Замените на вашу основную ветку, если она называется иначе (например, master)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Выбираем ОС для работы
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Клонируем репозиторий
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2  # Устанавливаем Node.js
+        with:
+          node-version: '16'  # Укажите нужную версию Node.js
+
+      - name: Install dependencies
+        run: npm install  # Устанавливаем зависимости
+
+      - name: Build the project
+        run: npm run build  # Собираем проект
+
+      - name: Deploy to GitHub Pages
+        run: npm run deploy  # Выполняем команду для деплоя
