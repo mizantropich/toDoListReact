@@ -1,14 +1,28 @@
-.app {
-  max-width: 360px;
-  width: 100%;
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+.container {
+	max-width: 1440px;
+	min-width: 375px;
+	margin: 0 auto;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 16px;
+/* Контейнер приложения */
+.todoApp {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Адаптив для планшетов */
+@media (max-width: 768px) {
+  .todoApp {
+    padding: 24px;
+  }
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 480px) {
+  .todoApp {
+    padding: 16px;
+    min-width: 320px;
+  }
 }

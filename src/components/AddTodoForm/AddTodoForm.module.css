@@ -1,0 +1,68 @@
+.form {
+  display: flex;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+/* Скрытый label для скринридеров */
+.label {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.helpText {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.input:focus {
+  border-color: #377cfb;
+  box-shadow: 0 0 0 3px rgba(55, 124, 251, 0.1);
+}
+
+.button {
+  padding: 10px 20px;
+  background: #377cfb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.button:hover {
+  background: #2156b6;
+}
+
+.button:focus {
+  outline: 2px solid #377cfb;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .form {
+    flex-direction: column;
+  }
+  
+  .button {
+    width: 100%;
+  }
+}
