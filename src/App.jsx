@@ -16,7 +16,10 @@ function App() {
 	const [tasks, setTasks] = useState(initialTasks);
 
 	const handleAdd = (text) => {
-		console.log('add', text);
+		setTasks((prevTasks) => [
+			...prevTasks,
+			{ id: Date.now(), text, completed: false },
+		]);
 	};
 
 	const handleToggle = (id) => {
