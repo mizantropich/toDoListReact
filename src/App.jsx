@@ -12,22 +12,30 @@ const initialTasks = [
 	{ id: 2, text: 'Build a Todo App', completed: true },
 ];
 
+function generateId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 function App() {
 	const [tasks, setTasks] = useState(initialTasks);
 
 	const handleAdd = (text) => {
 		setTasks((prevTasks) => [
 			...prevTasks,
-			{ id: Date.now(), text, completed: false },
+			{ id: generateId(), text, completed: false },
 		]);
 	};
 
 	const handleToggle = (id) => {
-		console.log('toggle', id);
+		setTasks((prevTasks) =>
+			prevTasks.map((task) =>
+				task.id === id ? { ...task, completed: !task.completed } : task
+			)
+		);
 	};
 
 	const handleDelete = (id) => {
-		console.log('delete', id);
+		setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
 	};
 
 	return (
