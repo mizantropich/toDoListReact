@@ -12,12 +12,35 @@ const initialTasks = [
 	{ id: 2, text: 'Build a Todo App', completed: true },
 ];
 
+const FILTERS = {
+  ALL: 'all',
+  ACTIVE: 'active',
+  COMPLETED: 'completed',
+};
+
 function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 function App() {
 	const [tasks, setTasks] = useState(initialTasks);
+	const [currentFilter, setFilter] = useState(FILTERS.ALL);
+
+	const filteredTasks = tasks.filter((task) => {
+		switch (currentFilter) {
+			case FILTERS.ACTIVE:
+				return !task.completed;
+			case FILTERS.COMPLETED:
+				return task.completed;
+			case FILTERS.ALL:
+			default:
+				return true;
+		}
+	});
+
+	const activeCount = tasks.filter((task) => !task.completed).length;
+	const completedCount = tasks.filter((task) => task.completed).length;
+	const totalCount = tasks.length;
 
 	const handleAdd = (text) => {
 		setTasks((prevTasks) => [
@@ -44,11 +67,12 @@ function App() {
 			<div className={styles.todoApp}>
 				<AddTodoForm onAdd={handleAdd} />
 				<TodoStats
-					activeCount={tasks.filter((task) => !task.completed).length}
-					totalCount={tasks.length}
+					activeCount={activeCount}
+					completedCount={completedCount}
+					totalCount={totalCount}
 				/>
-				<TodoFilters currentFilter="all" />
-				{tasks.map((task) => (
+				<TodoFilters currentFilter={currentFilter} onChangeFilter={setFilter} />
+				{filteredTasks.map((task) => (
 					<TodoItem
 						key={task.id}
 						task={task}

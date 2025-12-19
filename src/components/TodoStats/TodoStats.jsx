@@ -1,7 +1,6 @@
 import styles from './TodoStats.module.css';
 
-export function TodoStats ({ activeCount, totalCount }) {
-	const completedCount = totalCount - activeCount;
+export function TodoStats ({ activeCount, completedCount, totalCount }) {
 
 	return (
 		<div className={styles.stats}>

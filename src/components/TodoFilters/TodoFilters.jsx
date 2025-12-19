@@ -1,6 +1,6 @@
 import styles from './TodoFilters.module.css'
 
-export function TodoFilters({currentFilter}) {
+export function TodoFilters({currentFilter,onChangeFilter}) {
   const filters = [
     { id: 'all', label: 'Все' },
     { id: 'active', label: 'Активные' },
@@ -12,9 +12,11 @@ export function TodoFilters({currentFilter}) {
             {filters.map(filter => (
                 <button 
                     key={filter.id}
+										type='button'
                     className={`${styles.filterButton} ${filter.id === currentFilter ? styles.active : ''}`}
                     aria-current={filter.id === currentFilter ? 'true' : 'false'}
 										aria-label={`Показать ${filter.label.toLowerCase()} задачи`}
+										onClick={() => onChangeFilter(filter.id)}
                 >
                     {filter.label}
                 </button>
