@@ -6,6 +6,7 @@ import { AddTodoForm } from './components/AddTodoForm/AddTodoForm.jsx';
 import { TodoStats } from './components/TodoStats/TodoStats.jsx';
 import { TodoFilters } from './components/TodoFilters/TodoFilters.jsx';
 import { TodoItem } from './components/TodoItem/TodoItem.jsx';
+import { EmptyState } from './components/EmptyState/EmptyState.jsx';
 
 const initialTasks = [
 	{ id: 1, text: 'Learn React', completed: false },
@@ -42,6 +43,31 @@ function App() {
 	const completedCount = tasks.filter((task) => task.completed).length;
 	const totalCount = tasks.length;
 
+	const getEmptyStateMessage = () => {
+		// 1) Нет задач вообще
+		if (tasks.length === 0) {
+			return '📝 Нет задач. Добавьте первую!';
+		}
+
+		// 2) Есть задачи, но по фильтру ничего не осталось
+		if (filteredTasks.length === 0) {
+			switch (currentFilter) {
+				case FILTERS.ACTIVE:
+					return '✅ Все задачи выполнены!';
+				case FILTERS.COMPLETED:
+					return '📝 Нет выполненных задач';
+				case FILTERS.ALL:
+				default:
+					return '📝 Нет задач';
+			}
+		}
+
+		return null;
+	};
+
+	const emptyMessage = getEmptyStateMessage();
+	const showEmptyState = emptyMessage !== null;
+
 	const handleAdd = (text) => {
 		setTasks((prevTasks) => [
 			...prevTasks,
@@ -72,14 +98,18 @@ function App() {
 					totalCount={totalCount}
 				/>
 				<TodoFilters currentFilter={currentFilter} onChangeFilter={setFilter} />
-				{filteredTasks.map((task) => (
-					<TodoItem
-						key={task.id}
-						task={task}
-						onToggle={handleToggle}
-						onDelete={handleDelete}
-					/>
-				))}
+				{showEmptyState ? (
+					<EmptyState message={emptyMessage} />
+				) : (
+					filteredTasks.map((task) => (
+						<TodoItem
+							key={task.id}
+							task={task}
+							onToggle={handleToggle}
+							onDelete={handleDelete}
+						/>
+					))
+				)}
 			</div>
 		</div>
 	);
