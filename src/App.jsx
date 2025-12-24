@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './App.module.css';
 
 import { AddTodoForm } from './components/AddTodoForm/AddTodoForm.jsx';
@@ -8,10 +8,9 @@ import { TodoFilters } from './components/TodoFilters/TodoFilters.jsx';
 import { TodoItem } from './components/TodoItem/TodoItem.jsx';
 import { EmptyState } from './components/EmptyState/EmptyState.jsx';
 
-const initialTasks = [
-	{ id: 1, text: 'Learn React', completed: false },
-	{ id: 2, text: 'Build a Todo App', completed: true },
-];
+const STORAGE_KEY = 'todo.tasks';
+
+const initialTasks = [];
 
 const FILTERS = {
   ALL: 'all',
@@ -23,8 +22,75 @@ function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
+function isPlainObject(value) {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeCompleted(value) {
+	if (typeof value === 'boolean') return value;
+	if (typeof value === 'string') {
+		const v = value.toLowerCase().trim();
+		if (v === 'true') return true;
+		if (v === 'false') return false;
+	}
+	if (typeof value === 'number') {
+		if (value === 1) return true;
+		if (value === 0) return false;
+	}
+	// мягкий дефолт
+	return false;
+}
+
+function normalizeTask(raw) {
+	if (!isPlainObject(raw)) return null;
+
+	const id = raw.id;
+	const hasValidId = typeof id === 'string' || typeof id === 'number';
+	if (!hasValidId) return null;
+
+	const textRaw = raw.text;
+	if (textRaw === undefined || textRaw === null) return null;
+	const text = String(textRaw).trim();
+	if (text.length === 0) return null;
+
+	const completed = normalizeCompleted(raw.completed);
+
+	return { id, text, completed };
+}
+
+function loadTasksFromStorage() {
+	const stored = localStorage.getItem(STORAGE_KEY);
+	if (!stored) return initialTasks;
+
+	let parsed;
+	try {
+		parsed = JSON.parse(stored);
+	} catch (e) {
+		console.error('Error parsing tasks JSON:', e);
+		return initialTasks;
+	}
+
+	if (!Array.isArray(parsed)) return initialTasks;
+
+	const normalized = parsed.map(normalizeTask).filter(Boolean);
+
+	// если все элементы оказались мусором — возвращаем initialTasks (по твоему DoD)
+	return normalized.length > 0 ? normalized : initialTasks;
+}
+
 function App() {
-	const [tasks, setTasks] = useState(initialTasks);
+	const [tasks, setTasks] = useState(() => {
+    return loadTasksFromStorage();
+	});
+
+	useEffect(() => {
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+		} catch (error) {
+			console.error('Error saving tasks to localStorage:', error);
+		}
+	}, [tasks]);
+
 	const [currentFilter, setFilter] = useState(FILTERS.ALL);
 
 	const filteredTasks = tasks.filter((task) => {
