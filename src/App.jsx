@@ -41,6 +41,20 @@ function normalizeCompleted(value) {
 	return false;
 }
 
+function normalizeCreatedAt(value) {
+	// number (идеально)
+	if (typeof value === 'number' && Number.isFinite(value)) return value;
+
+	// string -> number (часто бывает после сохранений/миграций)
+	if (typeof value === 'string') {
+		const parsed = Number(value);
+		if (Number.isFinite(parsed)) return parsed;
+	}
+
+	// мягкий fallback для старых/битых данных
+	return Date.now();
+}
+
 function normalizeTask(raw) {
 	if (!isPlainObject(raw)) return null;
 
@@ -55,7 +69,9 @@ function normalizeTask(raw) {
 
 	const completed = normalizeCompleted(raw.completed);
 
-	return { id, text, completed };
+	const createdAt = normalizeCreatedAt(raw.createdAt);
+
+	return { id, text, completed, createdAt };
 }
 
 function loadTasksFromStorage() {
@@ -137,7 +153,7 @@ function App() {
 	const handleAdd = (text) => {
 		setTasks((prevTasks) => [
 			...prevTasks,
-			{ id: generateId(), text, completed: false },
+			{ id: generateId(), text, completed: false, crearesAt: Date.now() },
 		]);
 	};
 
