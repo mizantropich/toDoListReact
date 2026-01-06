@@ -1,7 +1,19 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px; /* space before task list */
+}
+
 .filters {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.sort {
+  display: flex;
+  gap: 8px;
 }
 
 .filterButton {
@@ -17,12 +29,36 @@
   font-weight: 500;
 }
 
+.sortButton {
+  flex: 1;
+  padding: 8px 14px;
+  border: 1px solid #d0d0d0;
+  background: #f9f9f9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  color: #555;
+  font-weight: 500;
+}
+
 .filterButton:hover {
   border-color: #377cfb;
   color: #377cfb;
 }
 
+.sortButton:hover {
+  border-color: #377cfb;
+  color: #377cfb;
+}
+
 .filterButton.active {
+  background: #377cfb;
+  color: white;
+  border-color: #377cfb;
+}
+
+.sortButton.active {
   background: #377cfb;
   color: white;
   border-color: #377cfb;
@@ -37,4 +73,35 @@
   .filterButton {
     width: 100%;
   }
+  
+  .sort {
+    flex-direction: column;
+  }
+
+  .sortButton {
+    width: 100%;
+  }
+}
+
+.clearCompletedButton {
+  margin-top: 4px;
+  padding: 10px 16px;
+  border: 1px solid #e0e0e0;
+  background: #fff5f5;
+  color: #c0392b;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.clearCompletedButton:hover:not(:disabled) {
+  background: #ffecec;
+  border-color: #c0392b;
+}
+
+.clearCompletedButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

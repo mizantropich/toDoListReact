@@ -18,6 +18,11 @@ const FILTERS = {
   COMPLETED: 'completed',
 };
 
+const SORT = {
+	NEWEST: 'newest',
+	OLDEST: 'oldest',
+};
+
 function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
@@ -95,9 +100,7 @@ function loadTasksFromStorage() {
 }
 
 function App() {
-	const [tasks, setTasks] = useState(() => {
-    return loadTasksFromStorage();
-	});
+	const [tasks, setTasks] = useState(() => loadTasksFromStorage());
 
 	useEffect(() => {
 		try {
@@ -108,6 +111,8 @@ function App() {
 	}, [tasks]);
 
 	const [currentFilter, setFilter] = useState(FILTERS.ALL);
+
+	const [sortType, setSortType] = useState(SORT.NEWEST);
 
 	const filteredTasks = tasks.filter((task) => {
 		switch (currentFilter) {
@@ -121,6 +126,11 @@ function App() {
 		}
 	});
 
+	const sortedTasks = [...filteredTasks].sort((a, b) => {
+		if (sortType === SORT.OLDEST) return a.createdAt - b.createdAt;
+		return b.createdAt - a.createdAt; // newest first
+	});
+
 	const activeCount = tasks.filter((task) => !task.completed).length;
 	const completedCount = tasks.filter((task) => task.completed).length;
 	const totalCount = tasks.length;
@@ -132,7 +142,7 @@ function App() {
 		}
 
 		// 2) Есть задачи, но по фильтру ничего не осталось
-		if (filteredTasks.length === 0) {
+		if (sortedTasks.length === 0) {
 			switch (currentFilter) {
 				case FILTERS.ACTIVE:
 					return '✅ Все задачи выполнены!';
@@ -153,7 +163,7 @@ function App() {
 	const handleAdd = (text) => {
 		setTasks((prevTasks) => [
 			...prevTasks,
-			{ id: generateId(), text, completed: false, crearesAt: Date.now() },
+			{ id: generateId(), text, completed: false, createdAt: Date.now() },
 		]);
 	};
 
@@ -169,6 +179,10 @@ function App() {
 		setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
 	};
 
+	const handleClearCompleted = () => {
+		setTasks((prevTasks) => prevTasks.filter((task) => !task.completed));
+	};
+
 	return (
 		<div className={styles.container}>
 			<h1>Todo List</h1>
@@ -179,11 +193,18 @@ function App() {
 					completedCount={completedCount}
 					totalCount={totalCount}
 				/>
-				<TodoFilters currentFilter={currentFilter} onChangeFilter={setFilter} />
+				<TodoFilters
+					currentFilter={currentFilter}
+					onChangeFilter={setFilter}
+					sortType={sortType}
+					onChangeSort={setSortType}
+					completedCount={completedCount}
+					onClearCompleted={handleClearCompleted}
+				/>
 				{showEmptyState ? (
 					<EmptyState message={emptyMessage} />
 				) : (
-					filteredTasks.map((task) => (
+					sortedTasks.map((task) => (
 						<TodoItem
 							key={task.id}
 							task={task}
