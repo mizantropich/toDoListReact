@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo} from 'react';
 import styles from './App.module.css';
 
 import { AddTodoForm } from './components/AddTodoForm/AddTodoForm.jsx';
@@ -80,8 +80,18 @@ function normalizeTask(raw) {
 }
 
 function loadTasksFromStorage() {
-	const stored = localStorage.getItem(STORAGE_KEY);
-	if (!stored) return initialTasks;
+	if (typeof Storage === 'undefined') {
+		return initialTasks;
+	}
+
+	let stored;
+	try {
+		stored = localStorage.getItem(STORAGE_KEY);
+		if (!stored) return initialTasks;
+	} catch (e) {
+		console.error('Error accessing localStorage:', e);
+		return initialTasks;
+	}
 
 	let parsed;
 	try {
@@ -102,7 +112,21 @@ function loadTasksFromStorage() {
 function App() {
 	const [tasks, setTasks] = useState(() => loadTasksFromStorage());
 
+	const [now, setNow] = useState(Date.now());
+
 	useEffect(() => {
+		const intervalId = setInterval(() => {
+			setNow(Date.now());
+		}, 5000);
+
+		return () => clearInterval(intervalId);
+	}, []);
+
+	useEffect(() => {
+		if (typeof Storage === 'undefined') {
+			return;
+		}
+
 		try {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 		} catch (error) {
@@ -114,25 +138,40 @@ function App() {
 
 	const [sortType, setSortType] = useState(SORT.NEWEST);
 
-	const filteredTasks = tasks.filter((task) => {
-		switch (currentFilter) {
-			case FILTERS.ACTIVE:
-				return !task.completed;
-			case FILTERS.COMPLETED:
-				return task.completed;
-			case FILTERS.ALL:
-			default:
-				return true;
-		}
-	});
+	const filteredTasks = useMemo(() => {
+		return tasks.filter((task) => {
+			switch (currentFilter) {
+				case FILTERS.ACTIVE:
+					return !task.completed;
+				case FILTERS.COMPLETED:
+					return task.completed;
+				case FILTERS.ALL:
+				default:
+					return true;
+			}
+		});
+	}, [tasks, currentFilter]);
 
-	const sortedTasks = [...filteredTasks].sort((a, b) => {
-		if (sortType === SORT.OLDEST) return a.createdAt - b.createdAt;
-		return b.createdAt - a.createdAt; // newest first
-	});
+	const sortedTasks = useMemo(() => {
+		return [...filteredTasks].sort((a, b) => {
+			if (sortType === SORT.OLDEST) return a.createdAt - b.createdAt;
+			return b.createdAt - a.createdAt; // newest first
+		});
+	}, [filteredTasks, sortType]);
 
-	const activeCount = tasks.filter((task) => !task.completed).length;
-	const completedCount = tasks.filter((task) => task.completed).length;
+	const { activeCount, completedCount } = useMemo(() => {
+		return tasks.reduce(
+			(acc, task) => {
+				if (task.completed) {
+					acc.completedCount++;
+				} else {
+					acc.activeCount++;
+				}
+				return acc;
+			},
+			{ activeCount: 0, completedCount: 0 }
+		);
+	}, [tasks]);
 	const totalCount = tasks.length;
 
 	const getEmptyStateMessage = () => {
@@ -210,6 +249,7 @@ function App() {
 							task={task}
 							onToggle={handleToggle}
 							onDelete={handleDelete}
+							now={now}
 						/>
 					))
 				)}

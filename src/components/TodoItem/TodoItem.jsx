@@ -1,7 +1,6 @@
 import styles from './TodoItem.module.css';
 
-function formatCreatedAgo(createdAt)	{
-	const now = Date.now();
+function formatCreatedAgo(createdAt, now) {
 	const diffMs = now - createdAt;
 	const diffSec = Math.floor(diffMs / 1000);
 	const diffMin = Math.floor(diffSec / 60);
@@ -22,7 +21,7 @@ function formatCreatedAgo(createdAt)	{
 	return 'создано только что';
 }
 
-export function TodoItem({task, onToggle, onDelete}) {
+export function TodoItem({task, onToggle, onDelete, now}) {
 	return (
 		<div className={`${styles.item} ${task.completed ? styles.completed : ''}`} role="listitem">
 			<input
@@ -36,7 +35,7 @@ export function TodoItem({task, onToggle, onDelete}) {
 				{task.text}
 			</span>
 			<span className={styles.createdAt}>
-				{formatCreatedAgo(task.createdAt)}
+				{formatCreatedAgo(task.createdAt, now)}
 			</span>
 			<button
 				className={styles.deleteButton}
